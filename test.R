@@ -1,3 +1,3 @@
 x = rep(1,10)
 y = 1:10
-plot(x, y)
+plot(x, y, xlim=c(-10, 10))
