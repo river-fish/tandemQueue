@@ -18,15 +18,15 @@ QueuesFunction <- function(T, lambda, mu){
   #       mu <- c(1.2)
   #       res <- QueuesFunction(T, lambda, mu[1])
   
-  if(T<=0){
+  if(T <= 0){
     stop('T should be a positive number')
   }
   
-  if(lambda<=0){
+  if(lambda <= 0){
     stop('lambda should be a positive number')
   }
   
-  if(length(mu)==0 | any(mu<=0)){
+  if(length(mu) == 0 | any(mu <= 0)){
     stop('The vector mu should have positive number of entries and all its entries should be positive')
   }
   # TODO: write a proper warning here
@@ -48,9 +48,9 @@ QueuesFunction <- function(T, lambda, mu){
   colnames(serving_times) <- paste0('Q_serving_',seq_along(mu)) # not really needed probably
   
   # the following data frames keep information about times of 'entering GP's room' and 'leaving the room'
-  entering_times <- data.frame(matrix(NA, nrow=n, ncol=length(mu)))
+  entering_times <- data.frame(matrix(NA, nrow = n, ncol = length(mu)))
   # column 1 in leaving_times is the arrival times
-  leaving_times <- data.frame(matrix(NA, nrow=n, ncol=length(mu)+1))
+  leaving_times <- data.frame(matrix(NA, nrow = n, ncol = length(mu)+1))
   leaving_times[,1] <- vector_arrival_times
   
   
