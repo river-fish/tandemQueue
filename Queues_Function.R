@@ -34,13 +34,14 @@ QueuesFunction <- function(T, lambda, mu){
     warning('?')
   }
   
-  # arrival times following the Poisson process
+  # simulate poisson process on [0,T]
+  # TODO: optimise so we don't need the while loop
   vector_arrival_times <- c(0)
   while(vector_arrival_times[length(vector_arrival_times)] <= T){
     vector_arrival_times <- c(vector_arrival_times, vector_arrival_times[length(vector_arrival_times)] + rexp(1, lambda))
   }
   
-  # number of patients
+  # number of patients   TODO correct this for optimised vector_arrival_times
   n <- length(vector_arrival_times)  
   
   # serving times in all queues
@@ -55,6 +56,7 @@ QueuesFunction <- function(T, lambda, mu){
   
   
   for(i in seq_along(mu)){
+  	#TODO Emilia
     entering_times[,i] <- pmax(leaving_times[,i], leaving_times[1,i] + c(0,cumsum(serving_times[-nrow(serving_times),i])))
     leaving_times[,i+1] <- entering_times[,i] + serving_times[,i]
   }
@@ -62,16 +64,15 @@ QueuesFunction <- function(T, lambda, mu){
   # TODO: make a better grid (?)
   # number of people in different queues
   nr_people_queue <-  sapply(seq_along(mu), function(i){
+  	# make the number of gridpoints an argument of the function
     sapply(seq_len(ceiling(T)), function(t){
       sum((leaving_times[,i] <t) & (leaving_times[,i+1]>=t))
     })})
   
+  #TODO make the output a df for each queue, with the first 
+  #column time that the queue legnth changes, the second 
+  #the new number of people in the queue
   return(list(nr_people_queue = nr_people_queue,
               total_times = leaving_times[,length(mu)+1] - leaving_times[,1]))
 }
-
-
-
-
-
 
