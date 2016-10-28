@@ -61,18 +61,16 @@ QueuesFunction <- function(T, lambda, mu){
     leaving_times[,i+1] <- entering_times[,i] + serving_times[,i]
   }
   
-  # TODO: make a better grid (?)
-  # number of people in different queues
-  nr_people_queue <-  sapply(seq_along(mu), function(i){
-  	# make the number of gridpoints an argument of the function
-    sapply(seq_len(ceiling(T)), function(t){
-      sum((leaving_times[,i] <t) & (leaving_times[,i+1]>=t))
-    })})
+  # the result now is a list of data frames
+  result <- lapply(seq_along(mu), function(i){
+    df <- data.frame(time = c(leaving_times[-1,i], leaving_times[-1,i+1]),
+                     event = c(rep(c(1,-1), each=n)))
+    df <- df[order(df$time),]
+    df$nr_people <- cumsum(df$event)
+    rownames(df) <- NULL
+    df
+  })
   
-  #TODO make the output a df for each queue, with the first 
-  #column time that the queue legnth changes, the second 
-  #the new number of people in the queue
-  return(list(nr_people_queue = nr_people_queue,
-              total_times = leaving_times[,length(mu)+1] - leaving_times[,1]))
+  return(result)
 }
 
