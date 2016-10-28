@@ -41,7 +41,7 @@ __TODO:__
 
 Have a better idea of comparability: quickly glance in literature on comparing queue simulations?
 
-### 2) Ideas for experiments/ Techniques
+### 2) Ideas for experiments/techniques
 
 1. Change the ratio's of mean server rates.
 2. Change the location of the slowest server.
@@ -55,7 +55,7 @@ __Notes on distributions:__
 * First try deterministic server rates and maybe uniform. 
 * Heavy-tailed distributions: first try one with many moments, then maybe Cauchy-like (e.g. f(x) \propto (1+ x^2)^(-2))
 
-__Exploration:__
+__TODO, to explore:__
 
 5. Hammersley book: control variates, ...
 6. Burk's theorem: reversibility to Poisson departures ( something with innovations in one direction vs innovations in other direction)
