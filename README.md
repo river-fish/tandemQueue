@@ -43,7 +43,7 @@ Have a better idea of comparability: quickly glance in literature on comparing q
 
 ### 2) Ideas for experiments/techniques
 
-1. Change the ratio's of mean server rates.
+1. Change the ratios of mean server rates.
 2. Change the location of the slowest server.
 3. Change all the server distributions.
 4. Put different distributions in series and compare on relative position. E.g. heavy-tailed before or behind slowest.
@@ -53,12 +53,14 @@ How to link these ideas to theory? (__TODO(Jack): How to get a better intuition 
 __Notes on distributions:__
 
 * First try deterministic server rates and maybe uniform. 
+* Mixtures of distributions: e.g. i.e. different types of cutomers. Extend state space to fast anf slow people.
 * Heavy-tailed distributions: first try one with many moments, then maybe Cauchy-like (e.g. f(x) \propto (1+ x^2)^(-2))
 
 __TODO, to explore:__
 
 5. Hammersley book: control variates, ...
 6. Burk's theorem: reversibility to Poisson departures ( something with innovations in one direction vs innovations in other direction)
+7. "need one more moment" controling the mean waiting time means we need to control the variance of the service time.
 
 ### 3) Diagnostics/visualisation
 
@@ -80,6 +82,8 @@ __List of TODOs:__
 
 * Adjust queuing function
 * Implement estimates of stationary distribution (histograms for every queue)
+* Implement some gen eric plotting functions for queues
+* Change the queues function to use means as parameters not rates
 
 
 ## Literature
