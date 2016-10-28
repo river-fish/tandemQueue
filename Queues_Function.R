@@ -50,15 +50,19 @@ QueuesFunction <- function(T, lambda, mu){
   
   # the following data frames keep information about times of 'entering GP's room' and 'leaving the room'
   entering_times <- data.frame(matrix(NA, nrow = n, ncol = length(mu)))
-  # column 1 in leaving_times is the arrival times
-  leaving_times <- data.frame(matrix(NA, nrow = n, ncol = length(mu)+1))
-  leaving_times[,1] <- vector_arrival_times
-  
-  
-  for(i in seq_along(mu)){
-  	#TODO Emilia
-    entering_times[,i] <- pmax(leaving_times[,i], leaving_times[1,i] + c(0,cumsum(serving_times[-nrow(serving_times),i])))
-    leaving_times[,i+1] <- entering_times[,i] + serving_times[,i]
+  leaving_times <- data.frame(matrix(NA, nrow = n+1, ncol = length(mu)+1))
+  # column 1 in leaving_times is the arrival times, as if people left home
+  leaving_times[ ,1] <- c(0, vector_arrival_times)
+  # leaving times of person zero equal to zero - so all docs are empty to begin with
+  leaving_times[1, ] <- rep(0, length(mu) + 1)
+
+  for(j in seq_along(mu)){
+    for(i in seq_len(n)){
+
+    entering_times[i, j] <- max(leaving_times[i, j+1], leaving_times[i+1, j])
+    leaving_times[i+1, j+1] <- entering_times[i, j] + serving_times[i, j]
+
+    }
   }
   
   # TODO: make a better grid (?)
