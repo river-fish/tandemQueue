@@ -3,11 +3,9 @@
 
 This README is meant as an interactive communication platform. It lists the goals of the project, ways to approach it and goals of experiments. Please update me with results, both experimental as theoretical thoughts (e.g. design, motivation for experiments and methodology, theoretical issues, ...)!!
 
-It might be useful to look up some papers that compare queueing set-ups! (__TODO__)
+It might be useful to look up some papers that compare queueing set-ups, to gain insight in diagnostics, estimates, comparability, interesting set-ups ...! (__TODO__)
 
-## Goal
-
-The goals of this project are:
+## Goals
 
 ### 1) Theory
 > Review the theory for the Poisson arrivals and exponentially distributed service times, for servers in sequence that are reversible;
@@ -30,20 +28,11 @@ __Current hypothesis:__
 
 _Expectation_: we will need higher order moments to account for heavy tails.
 
-__Notes:__
-
-experiment with ratio's of mean server rates, compare a different global (i.e. for all) distributions, compare how distributions can be combined to break it (e.g. heavy-tailed right before or after the slow one). 
-
-Try mixtures, Hamemersly, play around reversibility?
-
-Inspiration: literature....
-
-
 ## Design of experiments
 
 We will always take a set-up with six servers and Poisson arrival rate 1.
 
-### Comparability
+### 1) Comparability
 
 1. When comparing distriubtions, keep mean server rates fixed.
 2. To compare queues and account for randomness in the simulations, couple the servers with a [cdf-transform] if the quantile function is available. __TODO:__ better method for when this is not the case?
@@ -52,7 +41,7 @@ __TODO:__
 
 Have a better idea of comparability: quickly glance in literature on comparing queue simulations?
 
-### Ideas for experiments/ Techniques
+### 2) Ideas for experiments/ Techniques
 
 1. Change the ratio's of mean server rates.
 2. Change the location of the slowest server.
@@ -62,23 +51,37 @@ Have a better idea of comparability: quickly glance in literature on comparing q
 How to link these ideas to theory? (__TODO(Jack): How to get a better intuition on other settings?__)
 
 __Notes on distributions:__
+
 * First try deterministic server rates and maybe uniform. 
 * Heavy-tailed distributions: first try one with many moments, then maybe Cauchy-like (e.g. f(x) \propto (1+ x^2)^(-2))
 
 __Exploration:__
+
 5. Hammersley book: control variates, ...
 6. Burk's theorem: reversibility to Poisson departures ( something with innovations in one direction vs innovations in other direction)
 7. __TODO(Tamar):__ What did Wilfrid mention again on "that" guy from "that" company?
 
-### Diagnostics/visualisation
+### 3) Diagnostics/visualisation
 
 __TODO:__ How to use covariation study between different queues?
 
-### Code
+__TODO:__ Include ideas for diagnostics
+
+__TODO:__ Report on choices for diagnostics?visualisations. E.g. ergodic averages vs fixed times. __Literature??__
+
+## Results of experiments
+
+Please summarize the results of simulation studies. We can use the following format to refer to a certain set-up (in order of the server sequence):
+
+> [Exp(.5), Exp(.3), Unif(0, .5), Deterministic(.3), Cauchy(...), Exp(.001)]
+
+## Code
 
 __List of TODOs:__
+
 * Adjust queuing function
 * Implement estimates of stationary distribution (histograms for every queue)
+
 
 ## Literature
 
@@ -87,8 +90,5 @@ Here we can list interesting literature, either to explore, or to have an overvi
 1. Asmussen
 2. Hammersley
 
-
-
-[//]: 
 
  [cdf-transform]: <https://en.wikipedia.org/wiki/Inverse_transform_sampling>
