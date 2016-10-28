@@ -77,3 +77,6 @@ QueuesFunction <- function(T, lambda, mu){
   
   return(result)
 }
+
+test_queue = QueuesFunction(10,0.6,c(0.3,0.4))
+save(test_queue, file = "data/test_queue.RData")
