@@ -37,10 +37,11 @@ QueuesFunction <- function(T, lambda, mu){
   # simulate poisson process on [0,T]
   # n- number of patients
   n <- rpois(1, lambda*T)
+
   if (n==0){
     stop('Number of arivals equals 0. Try with a larger value of T.')
   } else{
-    vector_arrival_times <- runif(n, min = 0, max = lambda*T)
+    vector_arrival_times <- sort(c(0, runif(n - 1, min = 0, max = T)))
   }
   
   # serving times in all queues
@@ -77,5 +78,6 @@ QueuesFunction <- function(T, lambda, mu){
   return(result)
 }
 
-test_queue = QueuesFunction(10,0.6,c(0.3,0.4))
-save(test_queue, file = "data/test_queue.RData")
+test_queues = QueuesFunction(20,0.36,c(0.4,0.5,0.6))
+test_queues
+save(test_queues, file = "data/test_queues.RData")
