@@ -35,14 +35,13 @@ QueuesFunction <- function(T, lambda, mu){
   }
   
   # simulate poisson process on [0,T]
-  # TODO: optimise so we don't need the while loop
-  vector_arrival_times <- c(0)
-  while(vector_arrival_times[length(vector_arrival_times)] <= T){
-    vector_arrival_times <- c(vector_arrival_times, vector_arrival_times[length(vector_arrival_times)] + rexp(1, lambda))
+  # n- number of patients
+  n <- rpois(1, lambda*T)
+  if (n==0){
+    stop('Number of arivals equals 0. Try with a larger value of T.')
+  } else{
+    vector_arrival_times <- runif(n, min = 0, max = lambda*T)
   }
-  
-  # number of patients   TODO correct this for optimised vector_arrival_times
-  n <- length(vector_arrival_times)  
   
   # serving times in all queues
   serving_times <- as.data.frame(lapply(mu, function(x) rexp(n, x)))
