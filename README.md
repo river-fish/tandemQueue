@@ -59,7 +59,6 @@ __TODO, to explore:__
 
 5. Hammersley book: control variates, ...
 6. Burk's theorem: reversibility to Poisson departures ( something with innovations in one direction vs innovations in other direction)
-7. __TODO(Tamar):__ What did Wilfrid mention again on "that" guy from "that" company?
 
 ### 3) Diagnostics/visualisation
 
@@ -89,6 +88,7 @@ Here we can list interesting literature, either to explore, or to have an overvi
 
 1. Asmussen
 2. Hammersley
+3. The guy from Herriott Watt that is the expert in heavy tails + queues: https://scholar.google.co.uk/citations?user=tRVsLywAAAAJ&hl=en
 
 
  [cdf-transform]: <https://en.wikipedia.org/wiki/Inverse_transform_sampling>
