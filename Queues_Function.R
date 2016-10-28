@@ -79,4 +79,3 @@ QueuesFunction <- function(T, lambda, mu){
   return(list(nr_people_queue = nr_people_queue,
               total_times = leaving_times[,length(mu)+1] - leaving_times[,1]))
 }
-
