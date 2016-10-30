@@ -3,11 +3,14 @@ QueuesFunction <- function(serving_times, vector_arrival_times){
   
   # Args: serving_times - a data frame in which the entry [i, j] is a serving time for patient i in queue j 
   #       vector_arrival_times - vector of lenght nrow(serving_times) containing patients' arrival times
-  # 
-  # Output: a list of data frames containing times, events (+1 person or -1 person) 
+  #
+  # Output: a list of two elements
+  #
+  #         first element:
+  #         a list of data frames containing times, events (+1 person or -1 person) 
   #         and the number of people at a corresponding time for a given queue
-  #
-  #
+  #       
+  #         second element: a data frame of leaving_times
   
   if (ncol(serving_times) == 0 | nrow(serving_times)== 0 | length(vector_arrival_times)== 0){
     stop('No dimension of the argumens can be equal to 0.')
@@ -48,6 +51,10 @@ QueuesFunction <- function(serving_times, vector_arrival_times){
     df
   })
   
-  return(result)
+  # deleting the first row since it was just a 'fake' person
+  leaving_times <- leaving_times[-1,]
+  colnames(leaving_times) <- c('Arrival_time', paste0('Leaving_queue', seq_len(nr_queues), '_time' ))
+  
+  return(list(queues_list = result,leaving_times = leaving_times))
 }
 

@@ -13,8 +13,8 @@ Suppose we want to compare two Queing Systems, one of them with uniform distribu
 ```{r}
 source('Queues_Function.R')
 # fix T and lambda
-T = 100
-lambda = 0.5
+T <- 100
+lambda <- 1
 
 # fix also parameters min and max (of uniform dist.) for the 3 queues:
 # in or case unif(0,6), unif(1,7), unif(2,9)
@@ -58,7 +58,7 @@ colMeans(serving_times_exp)
 
 # performing QueuesFunction on serving_times_unif and serving_times_exp
 queue_unif <- QueuesFunction(serving_times_unif, vector_arrival_times)
-queue_exp <- QueuesFunction(serving_times_unif, vector_arrival_times)
+queue_exp <- QueuesFunction(serving_times_exp, vector_arrival_times)
 ```
 
 ## Example 2
@@ -67,23 +67,53 @@ Suppose we cannot use inverse transform method, so we don't care about using the
 
 ```{r}
 set.seed(13)
+T <- 50
+lambda <- 1
 # create a sample from the Poisson process
 n <- rpois(1, lambda*T)
 n 
 
 vector_arrival_times <- sort(c(0, runif(n - 1, min = 0, max = T)))
-serving_times <- as.data.frame(cbind(V1 = abs(rcauchy(n, 0, 1)),
+serving_times_different <- as.data.frame(cbind(V1 = abs(rcauchy(n, 0, 1)),
                                      V2 = runif(n, 3, 4),
                                      V3 = abs(rnorm(n, 0, 1)),
                                      V4 = rgamma(n, 5, 6),
                                      V5 = rgamma(n, 7, 100),
                                      V6 = abs(rt(n, 1))))
                                      
-queue_different <- QueuesFunction(serving_times_unif, vector_arrival_times) 
+queue_different <- QueuesFunction(serving_times_different, vector_arrival_times) 
 summary(queue_different)
 ```
 
+One of the ideas discussed on Friday was measuring correlation between the waiting time in subsequent queues. Technically, the output of our function contains `waiting time + time of being served'. Hence, we can do the following thing:
 
+```{r}
+leaving_times <- queue_different$leaving_times
+waiting_times <- leaving_times[,2:ncol(leaving_times)] - leaving_times[,1:(ncol(leaving_times)-1)] - serving_times_different
 
+cor(waiting_times)
+```
 
+## Example 3
+
+The simplest example, in which all serving times are deterministic
+
+```{r}
+set.seed(13)
+T <- 50
+lambda <- 1
+# create a sample from the Poisson process
+n <- rpois(1, lambda*T)
+
+# serving times in subsequent queues: 10, 20, 30, 20, 40, 5
+serving_times_deterministic <- as.data.frame(matrix(rep(c(10, 20, 30, 100, 40, 5), times = n),
+                                                    ncol=6, byrow=TRUE))
+
+queue_deterministic <- QueuesFunction(serving_times_deterministic, vector_arrival_times) 
+leaving_times <- queue_deterministic$leaving_times
+waiting_times <- leaving_times[,2:ncol(leaving_times)] - leaving_times[,1:(ncol(leaving_times)-1)] -
+serving_times_deterministic
+
+colMeans(waiting_times)
+```
 
