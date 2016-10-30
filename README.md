@@ -20,6 +20,8 @@ __TODO: complete__
 
 > Design and conduct simulation studies to see whether the "slowest server controls stability" remains true for a sequence of queues as above, when service times are not exponentially distributed.
 
+> The file example_Queues.Rmd and its compiled version .pdf present 3 most common (at least this was my impression) cases in which we may want to use the function Queues_Function (exponential vs uniform, all 6 distributions different and deterministic values of serving times. Please do read them before you start performing any simulations since they should be useful. They are designed in such a way that you can just change parameters easily (change a few numbers appearing in the code) to obtain your result.
+
 We formulate a hypothesis and try to break it. The question becomes: how can we design scenario's where it is not decided by the slowest. 
 
 __Current hypothesis:__
@@ -80,7 +82,7 @@ Please summarize the results of simulation studies. We can use the following for
 
 __List of TODOs:__
 
-* Adjust queuing function
+* Adjust queuing function (it is already adjusted; now the output of the function is a list containing two elements, in which the first one is the list of data frames (the old version of output) and the second one is the data frame leaving_times; hence, if you want to use the output as earlier, use output[[1]])
 * Implement estimates of stationary distribution (histograms for every queue)
 * Implement some gen eric plotting functions for queues
 * Change the queues function to use means as parameters not rates
