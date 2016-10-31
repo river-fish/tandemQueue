@@ -145,3 +145,16 @@ serving_times_pareto <- sapply(seq_len(ncol(temp_df)), function(i){
 queue_pareto <- QueuesFunction(serving_times_pareto, vector_arrival_times) 
 ```
 
+## Example 5
+
+Now let us focus on the departure process. We will compute avarage time of waiting for `next departure' using queue_exp from Example 1. The departure process in this case should be the Poisson process with $\lambda=1$ considered for $T=100$.
+
+```{r}
+list_data_frames <- queue_exp[[1]]
+# for each queue we will get a vector for 'waiting for the next departure time'
+waiting_departure_df <- as.data.frame(lapply(list_data_frames, function(df){
+  departure_times <- df[which(df$event==-1),]$time
+  departure_times[-1] - departure_times[-length(departure_times)]
+  }))
+```
+
