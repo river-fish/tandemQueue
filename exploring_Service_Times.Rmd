@@ -1,0 +1,69 @@
+---
+title: "Exponential service time tandem queues"
+author: "Tamar Loach"
+date: "31 October 2016"
+output: pdf_document
+---
+
+## Example 1
+
+Most of the theory we've looked at for MM1 queues in series assumes exponential service times at each station. We want to simulate such queues, with a view to exploring changes in system behaviour that occur under different, application-motivated service time distrubutions. With this in mind, we look at expionential service time distributions as a comparison to theory is tractable, generating these distributions from a uniform distribution such that we can reuse this and retain the same nonlinear correlation structure when it comes to testing alternate service times distributions.
+
+
+```{r}
+source('Queues_Function.R')
+
+T <- 10000
+lambda <- 1  # mean of the poisson process arrivals
+
+# Poisson process arrivals
+set.seed(13)
+n <- rpois(1, lambda*T)
+cat("Number of patients is: ", n)
+arrival_times <- sort(c(0, runif(n - 1, min = 0, max = T)))
+
+# Specify parameters for uniform servuce times
+param_unif_df <- data.frame(min = c(0, 1, 2, 3),
+                            max = c(4, 5, 6, 7)
+                            )
+# Calculate the means associated with these
+param_unif_df$mean <- 2/(param_unif_df$max + param_unif_df$min)
+
+# Generate uniforms and rescale according to specified parameters
+standard_unif_df <- matrix(runif(n*nrow(param_unif_df)), nrow=n)
+serving_times_unif <- sapply(seq_len(ncol(standard_unif_df)), function(i){
+  param_unif_df$min[i] + standard_unif_df[,i]*(param_unif_df$max[i] - param_unif_df$min[i])
+})
+
+# Inverse transform to get exp service times
+serving_times_exp <- sapply(seq_len(ncol(standard_unif_df)), function(i){
+  - log(1-standard_unif_df[,i])/param_unif_df$mean[i]
+  })
+
+# Generate queues with the specified arrival and service dists
+queues_unif <- QueuesFunction(serving_times_unif, arrival_times)
+queues_exp <- QueuesFunction(serving_times_exp, arrival_times)
+
+```
+
+Plot the number of people in each queue over time
+#TODO (Tamar) change plot limits so we don't look at times > T
+
+```{r}
+source('Queues_Plots.R')
+
+PlotNrPeople(queues_unif)
+PlotNrPeople(queues_exp)
+
+```
+
+Plot the hist of queue legnths for each queue
+
+```{r}
+source('Queues_Plots.R')
+
+HistNrPeople(queues_unif)
+HistNrPeople(queues_exp)
+
+```
+
