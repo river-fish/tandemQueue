@@ -5,7 +5,7 @@ date: "31 October 2016"
 output: pdf_document
 ---
 
-## Example 1
+## Exponentially distributed service times
 
 Most of the theory we've looked at for MM1 queues in series assumes exponential service times at each station. We want to simulate such queues, with a view to exploring changes in system behaviour that occur under different, application-motivated service time distrubutions. With this in mind, we look at expionential service time distributions as a comparison to theory is tractable, generating these distributions from a uniform distribution such that we can reuse this and retain the same nonlinear correlation structure when it comes to testing alternate service times distributions.
 
@@ -13,7 +13,7 @@ Most of the theory we've looked at for MM1 queues in series assumes exponential 
 ```{r}
 source('Queues_Function.R')
 
-T <- 10000
+T <- 10
 lambda <- 1  # mean of the poisson process arrivals
 
 # Poisson process arrivals
@@ -46,6 +46,7 @@ queues_exp <- QueuesFunction(serving_times_exp, arrival_times)
 
 ```
 
+
 Plot the number of people in each queue over time
 #TODO (Tamar) change plot limits so we don't look at times > T
 
@@ -62,7 +63,9 @@ Plot the hist of queue legnths for each queue
 ```{r}
 source('Queues_Plots.R')
 
-HistNrPeople(queues_unif)
+plot = HistNrPeople(queues_unif)
+ggsave('plots/test_plot.pdf', plot = plot)
+
 HistNrPeople(queues_exp)
 
 ```
