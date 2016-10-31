@@ -136,17 +136,33 @@ ComputeRunningLengthAverages = function(queues, start_time, end_time){
         # print(q_lengths[next_jump_time_index])
       }
     }
-    # print(length(cum_q_length_at_grid))
-    running_average_q_length[[i]] = cum_q_length_at_grid[250 + seq_len(250)] / (time_grid[250 + seq_len(250)] - start_time)
+    # To avoid division by 0, start from position 11:
+    running_average_q_length[[i]] = cum_q_length_at_grid[11 + seq_len(490)] / (time_grid[11 + seq_len(490)] - start_time)
   }
   
-  return(list(time_grid[250 + seq_len(250)], running_average_q_length))
+  return(list(time_grid[11 + seq_len(490)], running_average_q_length))
 }
 
-PlotRunningLengthAverages = function(output_running_averages) {
+PlotRunningLengthAverages = function(output_running_averages, init_time_to_plot) {
+
+  # Args:     output_running_averages - output from ComputeRunningLengthAverages.
+  #           init_time_to_plot - A number indicating the time to plot from.
+  #
+  # Output:   A nice plot of the running ergodic averages of the queue lengths.
+  
   time_grid = output_running_averages[[1]]
-  running_averages = output_running_averages[[2]]
-  nr_queues = length(running_averages)
+  # Select the time frame:
+  start_index = 1
+  while (time_grid[start_index] < init_time_to_plot){
+    start_index = start_index + 1
+  }
+  time_grid = time_grid[start_index - 1 + seq_len(length(time_grid) - start_index + 1)]
+  running_averages_init = output_running_averages[[2]]
+  running_averages = list()
+  nr_queues = length(running_averages_init)
+  for (i in seq_len(nr_queues)){
+    running_averages[[i]] = running_averages_init[[i]][start_index - 1 + seq_len(length(time_grid))]
+  }
   
   largest_queue_length = max(sapply(running_averages, max))
   
@@ -163,11 +179,11 @@ PlotRunningLengthAverages = function(output_running_averages) {
   legend("bottomright", legend_names, col= 1 + seq_len(nr_queues), lty=c(1,1))
 }
 
-test_hists = ComputeLengthHistogramsRec(test_queues, list(c(0),c(0),c(0)), 1.5, 30)
-PlotLengthHistograms(test_hists)
-
-running_averages = ComputeRunningLengthAverages(test_queues, 1.5,30)
-running_averages[[2]][[1]]
-running_averages[[1]]
-test_hists[[3]]
-PlotRunningLengthAverages(running_averages)
+# test_hists = ComputeLengthHistogramsRec(test_queues, list(c(0),c(0),c(0)), 1.5, 30)
+# PlotLengthHistograms(test_hists)
+# 
+# running_averages = ComputeRunningLengthAverages(test_queues, 1.5,30)
+# running_averages[[2]][[1]]
+# running_averages[[1]]
+# test_hists[[3]]
+# PlotRunningLengthAverages(running_averages)
