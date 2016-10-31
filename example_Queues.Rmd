@@ -117,3 +117,31 @@ serving_times_deterministic
 colMeans(waiting_times)
 ```
 
+## Example 4
+
+Suppose we want our serving times to follow some heavy tailed distribution. In this example we use Pareto distribution https://en.wikipedia.org/wiki/Pareto_distribution with $x_m=1$ and $\alpha=1.5$. Its p.d.f. is given by:
+$$
+f(x) = \frac{3}{2} x^{-2.5}
+$$
+This distribution has expected value equal to 3. If we want to use a distribution with another mean, by multiply our variable by an appropriate number.  
+Similarly to Example 1, we use inverse transform method to obtain Pareto distributed samples from uniform distribution.
+```{r}
+set.seed(13)
+T <- 50
+lambda <- 1
+means_pareto <- c(1,2,3,4,5,3)
+
+n <- rpois(1, lambda*T)
+
+# remember to make sure n > 0, otherwise there would be no patients
+n 
+vector_arrival_times <- sort(c(0, runif(n - 1, min = 0, max = T)))
+temp_df <- matrix(runif(n*length(means_pareto)), nrow=n)
+
+serving_times_pareto <- sapply(seq_len(ncol(temp_df)), function(i){
+  (1/(1-temp_df[,i])^(2/3))*means_pareto[i]/3
+  })
+
+queue_pareto <- QueuesFunction(serving_times_pareto, vector_arrival_times) 
+```
+
