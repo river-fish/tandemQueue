@@ -6,7 +6,7 @@ library(reshape2)
 PlotNrPeople <- function(queues){
   # This function plots the number of people in each queue over time
   # Args:
-  #     - queues, the result of a call to QueuesFunction
+  #    - queues, the first element of the result of a call to QueuesFunction
   # Returns:
   #     - a ggplot object (can use this as plot arg in ggsave())
   
@@ -34,7 +34,7 @@ PlotNrPeople <- function(queues){
 HistNrPeopleWithGeom <- function(queues, rho){
   # This function plots the normalised weighted histogram of the queue lengths for each queue
   # Args:
-  #     - queues, the result of a call to QueuesFunction
+  #     - queues, the first element of the result of a call to QueuesFunction
   # Returns:
   #     - a ggplot object (can use this as plot arg in ggsave())
   
