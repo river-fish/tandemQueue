@@ -13,8 +13,8 @@ Most of the theory we've looked at for MM1 queues in series assumes exponential 
 ```{r}
 source('Queues_Function.R')
 
-T <- 10
-lambda <- 1  # mean of the poisson process arrivals
+T <- 10000
+lambda <- 0.5  # param of the poisson process arrivals
 
 # Poisson process arrivals
 set.seed(13)
@@ -22,12 +22,12 @@ n <- rpois(1, lambda*T)
 cat("Number of patients is: ", n)
 arrival_times <- sort(c(0, runif(n - 1, min = 0, max = T)))
 
-# Specify parameters for uniform servuce times
-param_unif_df <- data.frame(min = c(0, 1, 2, 3),
-                            max = c(4, 5, 6, 7)
+# Specify parameters for uniform service times
+param_unif_df <- data.frame(min = c(0.51, 0.52, 0.53, 0.54),
+                            max = c(0.55, 0.56, 0.57, 0.58)
                             )
 # Calculate the means associated with these
-param_unif_df$mean <- 2/(param_unif_df$max + param_unif_df$min)
+param_unif_df$param <- 2/(param_unif_df$max + param_unif_df$min)
 
 # Generate uniforms and rescale according to specified parameters
 standard_unif_df <- matrix(runif(n*nrow(param_unif_df)), nrow=n)
@@ -37,18 +37,29 @@ serving_times_unif <- sapply(seq_len(ncol(standard_unif_df)), function(i){
 
 # Inverse transform to get exp service times
 serving_times_exp <- sapply(seq_len(ncol(standard_unif_df)), function(i){
-  - log(1-standard_unif_df[,i])/param_unif_df$mean[i]
+  - log(1-standard_unif_df[,i])/param_unif_df$param[i]
   })
 
 # Generate queues with the specified arrival and service dists
-queues_unif <- QueuesFunction(serving_times_unif, arrival_times)
-queues_exp <- QueuesFunction(serving_times_exp, arrival_times)
+queues_unif_list <- QueuesFunction(serving_times_unif, arrival_times)
+queues_exp_list <- QueuesFunction(serving_times_exp, arrival_times)
+
+```
+
+```{r}
+burn_in_time = T/10
+queues_unif = queues_unif_list$queues_list
+queues_exp = queues_exp_list$queues_list
+
+queues_unif = lapply(queues_unif, function(x) x[x$time <=T & x$time > burn_in_time, ])
+queues_exp = lapply(queues_exp, function(x) x[x$time <=T & x$time > burn_in_time, ])
 
 ```
 
 
+
 Plot the number of people in each queue over time
-#TODO (Tamar) change plot limits so we don't look at times > T
+
 
 ```{r}
 source('Queues_Plots.R')
@@ -58,15 +69,19 @@ PlotNrPeople(queues_exp)
 
 ```
 
-Plot the hist of queue legnths for each queue
+
+Plot the hist of queue legnths for each queue comparing to geometric dist
 
 ```{r}
 source('Queues_Plots.R')
 
-plot = HistNrPeople(queues_unif)
-ggsave('plots/test_plot.pdf', plot = plot)
+rho = lambda/param_unif_df$param
 
-HistNrPeople(queues_exp)
+plot = HistNrPeopleWithGeom(queues_unif, 1 - rho)
+plot
+
+plot = HistNrPeopleWithGeom(queues_exp, 1 - rho)
+plot
+
 
 ```
-
