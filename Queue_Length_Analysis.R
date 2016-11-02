@@ -1,4 +1,6 @@
+library(lattice)
 load('data/test_queues.RData')
+
 
 ComputeLengthHistogramsRec = function(queues, list_hists, start_time, end_time){
   
@@ -21,16 +23,17 @@ ComputeLengthHistogramsRec = function(queues, list_hists, start_time, end_time){
     stop('Queues length does not match list_hists length!')
   }
   
+  for (i in seq_len(length(list_hists))){
+    # TODO: change output from QueuesFunction or solve "smaller start_time than first recorded time" here:
+    if ( start_time <= queues[[i]]$time[1]){
+      stop(paste("'start_time' is smaller than the first recorded time in queue", i))
+    }
+  }
   
   for (i in seq_len(length(list_hists))){
     times = queues[[i]]$time
     q_lengths = queues[[i]]$nr_people
     hist_i = list_hists[[i]]
-    
-    # TODO: change output from QueuesFunction or solve smaller start_time than first recorded time here:
-    if ( start_time <= times[1]){
-      stop(paste("'start_time' is smaller than the first recorded time in queue", i))
-    }
     
     # Filter out the specified time frame
     start_index = sum(times <= start_time) # Counts 0 if start_time == 0
@@ -43,7 +46,7 @@ ComputeLengthHistogramsRec = function(queues, list_hists, start_time, end_time){
     q_lengths = q_lengths[(start_index - 1) + seq_len(end_index - start_index + 1)] # Starts from start_index
     
     # Compute time differences
-    time_diffs = c(times, end_time) - c(start_time, times) # Same lenngth as 'q_lengths'
+    time_diffs = c(times, end_time) - c(start_time, times) # Same length as 'q_lengths'
     # print(time_diffs)
     # print(q_lengths)
     
@@ -74,10 +77,113 @@ PlotLengthHistograms = function(list_hists, start_time, end_time){
   }
 }
 
-
+# TODO: check corectness: still deviation up to 3rd significant decimal?
 ComputeRunningLengthAverages = function(queues, start_time, end_time){
   
+  #
+  #
+  #
+  #
+  # Output: A list of a time grid and the corresponding mean queue lengths.  
+  #         The output starts at start_time + .5 * (end_time - start_time).
+  #
+  
+  for (i in seq_len(length(queues))){
+    # TODO: change output from QueuesFunction or solve "smaller start_time than first recorded time" here:
+    if ( start_time <= queues[[i]]$time[1]){
+      stop(paste("'start_time' is smaller than the first recorded time in queue", i))
+    }
+  }
+  
+  running_average_q_length = list()
+  for (i in seq_len(length(queues))){
+    times = queues[[i]]$time
+    q_lengths = queues[[i]]$nr_people
+
+    # Filter out the specified time frame
+    start_index = sum(times <= start_time) # Counts 0 if start_time == 0
+    end_index = sum(times < end_time)
+    if(start_index != end_index) {
+      times = times[(start_index) + seq_len(end_index - start_index)] # Starts from start_index + 1
+    } else {
+      times = c()
+    }
+    q_lengths = q_lengths[(start_index - 1) + seq_len(end_index - start_index + 1)] # Starts from start_index
+    
+    # Compute time differences
+    time_diffs = c(times, end_time) - c(start_time, times) # Same length as 'q_lengths'
+    
+    # Compute cumulative queue length; TODO: eliminate overhead in calculations
+    # Needs to be improved/cleaned up...
+    time_grid = (seq_len(501) - 1) / 500 * (end_time - start_time) + start_time
+    cum_q_length_at_times = c(0,cumsum(time_diffs * q_lengths)) # At start_time, times[1], times[2], ...
+    cum_q_length_at_grid = c()
+    next_jump_time_index = 1
+    times = c(times, end_time * 2) # To not go out of index range
+    for (j in seq_len(501)){
+      t = time_grid[j]
+      while(t > times[next_jump_time_index]){
+        next_jump_time_index = next_jump_time_index + 1
+      }
+      if (next_jump_time_index == 1){
+        cum_q_length_at_grid[j] = cum_q_length_at_times[next_jump_time_index] + (t - start_time) * q_lengths[next_jump_time_index]
+      } else {
+        cum_q_length_at_grid[j] = cum_q_length_at_times[next_jump_time_index] + (t - times[next_jump_time_index - 1]) * q_lengths[next_jump_time_index]
+        # print(paste("Point", j))
+        # print(t)
+        # print(times[next_jump_time_index])
+        # print(cum_q_length_at_grid)
+        # print(q_lengths[next_jump_time_index])
+      }
+    }
+    # To avoid division by 0, start from position 11:
+    running_average_q_length[[i]] = cum_q_length_at_grid[11 + seq_len(490)] / (time_grid[11 + seq_len(490)] - start_time)
+  }
+  
+  return(list(time_grid[11 + seq_len(490)], running_average_q_length))
 }
 
-test_hists = ComputeLengthHistogramsRec(test_queues, list(c(0),c(0),c(0)), 1.5, 30)
-PlotLengthHistograms(test_hists)
+PlotRunningLengthAverages = function(output_running_averages, init_time_to_plot) {
+
+  # Args:     output_running_averages - output from ComputeRunningLengthAverages.
+  #           init_time_to_plot - A number indicating the time to plot from.
+  #
+  # Output:   A nice plot of the running ergodic averages of the queue lengths.
+  
+  time_grid = output_running_averages[[1]]
+  # Select the time frame:
+  start_index = 1
+  while (time_grid[start_index] < init_time_to_plot){
+    start_index = start_index + 1
+  }
+  time_grid = time_grid[start_index - 1 + seq_len(length(time_grid) - start_index + 1)]
+  running_averages_init = output_running_averages[[2]]
+  running_averages = list()
+  nr_queues = length(running_averages_init)
+  for (i in seq_len(nr_queues)){
+    running_averages[[i]] = running_averages_init[[i]][start_index - 1 + seq_len(length(time_grid))]
+  }
+  
+  largest_queue_length = max(sapply(running_averages, max))
+  
+  plot(time_grid, running_averages[[1]], type = 'l', col = 2, xlab = "Time", ylab = "Average queue length",
+       ylim = c(0, largest_queue_length * 1.1))
+  if (nr_queues > 1){
+    for (i in (1 + seq_len(nr_queues -1))){
+      par(new = TRUE)
+      plot(time_grid, running_averages[[i]], col=i+1, type = 'l', xlab = "", ylab = "",
+           ylim = c(0, largest_queue_length * 1.1), bty = "n", axes = FALSE)
+    }
+  }
+  legend_names = sapply(seq_len(nr_queues), function(i) {paste("Queue", i)})
+  legend("bottomright", legend_names, col= 1 + seq_len(nr_queues), lty=c(1,1))
+}
+
+# test_hists = ComputeLengthHistogramsRec(test_queues, list(c(0),c(0),c(0)), 1.5, 30)
+# PlotLengthHistograms(test_hists)
+# 
+# running_averages = ComputeRunningLengthAverages(test_queues, 1.5,30)
+# running_averages[[2]][[1]]
+# running_averages[[1]]
+# test_hists[[3]]
+# PlotRunningLengthAverages(running_averages)
